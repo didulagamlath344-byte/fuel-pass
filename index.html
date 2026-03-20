@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Smart Fuel Pass Pro</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZ1ZWwgUGFzcyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZ1ZWxQYXNzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmY2MwMCIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi80ODMvNDgzNDk3LnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
+    <style>
+        :root { --gold: #ffcc00; --bg: #000; }
+        body { margin: 0; background: var(--bg); font-family: sans-serif; color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .tabs { display: flex; background: #111; border-bottom: 1px solid #222; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; color: #888; font-weight: bold; cursor: pointer; }
+        .tab-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
+
+        .view { display: none; flex: 1; overflow-y: auto; padding: 20px; text-align: center; }
+        .view.active { display: flex; flex-direction: column; }
+
+        /* Card Styles */
+        .v-no { font-size: 40px; font-weight: 900; color: var(--gold); margin-top: 20px; text-transform: uppercase; }
+        .qr-frame { background: white; width: 90vw; height: 90vw; max-width: 350px; margin: 20px auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        #qrImg { width: 100%; height: 100%; object-fit: contain; }
+        .stats { display: flex; justify-content: space-around; margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; }
+        .s-val { color: var(--gold); font-size: 20px; font-weight: bold; }
+        .s-lbl { font-size: 10px; opacity: 0.6; margin-top: 5px; }
+
+        /* Edit Styles */
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; font-size: 16px; }
+        .save-btn { width: 100%; padding: 18px; background: var(--gold); border: none; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        label { display: block; text-align: left; font-size: 12px; color: #888; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('card', this)">MY CARD</button>
+        <button class="tab-btn" onclick="switchTab('edit', this)">EDIT DATA</button>
+    </div>
+
+    <div id="card" class="view active">
+        <p class="v-no" id="dispV">BGW-0898</p>
+        <div class="qr-frame">
+            <img id="qrImg" src="" alt="Fuel QR">
+            <p id="noQrText" style="color:#888; display:none;">QR එක ඇතුළත් කර නැත</p>
+        </div>
+        <div class="stats">
+            <div><div class="s-val" id="dispQ">0L</div><div class="s-lbl">QUOTA</div></div>
+            <div style="border-left:1px solid #333; border-right:1px solid #333; padding:0 20px;"><div class="s-val" id="dispU">0L</div><div class="s-lbl">USED</div></div>
+            <div><div class="s-val" id="dispR" style="color:#00ff88;">0L</div><div class="s-lbl">REM</div></div>
+        </div>
+    </div>
+
+    <div id="edit" class="view">
+        <h3 style="color:var(--gold); margin-top:0;">පසුගිය විස්තර යාවත්කාලීන කරන්න</h3>
+        <label>වාහන අංකය</label><input type="text" id="inV">
+        <label>මුළු සතිපතා Quota (L)</label><input type="number" id="inQ">
+        <label>මේ සතියේ පාවිච්චි කළ ප්‍රමාණය (L)</label><input type="number" id="inU">
+        <label>QR Screenshot එක තෝරන්න</label><input type="file" id="inF" accept="image/*">
+        <button class="save-btn" onclick="saveData()">SAVE & UPDATE</button>
+        <p style="font-size:11px; color:#666; margin-top:20px;">මෙම දත්ත ඔබගේ දුරකථනයේ පමණක් සුරැකේ.</p>
+    </div>
+
+    <script>
+        const store = { v: 'f_v', q: 'f_q', u: 'f_u', i: 'f_i' };
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'card') loadData();
+        }
+
+        function loadData() {
+            const v = localStorage.getItem(store.v) || "--- ---";
+            const q = parseFloat(localStorage.getItem(store.q)) || 0;
+            const u = parseFloat(localStorage.getItem(store.u)) || 0;
+            const img = localStorage.getItem(store.i);
+
+            document.getElementById('dispV').innerText = v;
+            document.getElementById('dispQ').innerText = q + "L";
+            document.getElementById('dispU').innerText = u + "L";
+            document.getElementById('dispR').innerText = (q - u) + "L";
+
+            if(img) {
+                document.getElementById('qrImg').src = img;
+                document.getElementById('qrImg').style.display = 'block';
+                document.getElementById('noQrText').style.display = 'none';
+            } else {
+                document.getElementById('qrImg').style.display = 'none';
+                document.getElementById('noQrText').style.display = 'block';
+            }
+        }
+
+        function saveData() {
+            const v = document.getElementById('inV').value;
+            const q = document.getElementById('inQ').value;
+            const u = document.getElementById('inU').value;
+            const f = document.getElementById('inF').files[0];
+
+            if(v) localStorage.setItem(store.v, v.toUpperCase());
+            if(q) localStorage.setItem(store.q, q);
+            if(u) localStorage.setItem(store.u, u);
+
+            if(f) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    localStorage.setItem(store.i, e.target.result);
+                    alert("සියල්ල සුරැකුණි!");
+                    switchTab('card', document.querySelector('.tab-btn'));
+                };
+                reader.readAsDataURL(f);
+            } else {
+                alert("විස්තර යාවත්කාලීන විය!");
+                switchTab('card', document.querySelector('.tab-btn'));
+            }
+        }
+        window.onload = loadData;
+    </script>
+</body>
+</html>
