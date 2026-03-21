@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
     <title>Fuel Pass Pro Max</title>
+    
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZ1ZWwgUGFzcyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZ1ZWxQYXNzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmY2MwMCIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi80ODMvNDgzNDk3LnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Poppins:wght@300;600&display=swap');
 
         :root {
             --gold: #FFD700;
             --accent: #00F2FF;
-            --bg-overlay: rgba(0, 0, 0, 0.7);
+            --bg-overlay: rgba(0, 0, 0, 0.75);
             --glass: rgba(255, 255, 255, 0.1);
         }
 
@@ -37,7 +39,7 @@
             content: "";
             position: fixed; inset: 0;
             background: var(--bg-overlay);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             z-index: -1;
         }
 
@@ -67,64 +69,68 @@
         .v-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(0, 242, 255, 0.2); transform: scale(1.05); }
 
         .view { display: none; flex: 1; overflow-y: auto; padding: 0 20px 20px; }
-        .view.active { display: flex; flex-direction: column; animation: fadeIn 0.6s ease; }
+        .view.active { display: flex; flex-direction: column; animation: fadeIn 0.5s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Premium Card Container - Blurry Background */
         .card-container {
             background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
             border: 1px solid rgba(255,255,255,0.15);
             backdrop-filter: blur(25px);
             border-radius: 35px;
-            padding: 30px 20px;
+            padding: 25px 20px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
 
-        .v-icon-box { font-size: 50px; margin-bottom: 5px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.4)); }
-        .v-no-main { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; margin: 0; color: #fff; letter-spacing: 2px; }
+        .v-icon-box { font-size: 45px; margin-bottom: 5px; filter: drop-shadow(0 0 10px rgba(0,242,255,0.5)); }
+        .v-no-main { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 900; margin: 0; color: #fff; letter-spacing: 2px; }
 
-        /* QR Area - විශේෂයෙන්ම දියුණු කළ කොටස */
+        /* Super High Contrast QR Area */
         .qr-art-frame {
-            background: #FFFFFF; /* නියම සුදු පාට පසුබිම (No transparency/glass effect) */
+            background: #FFFFFF;
             width: 100%; aspect-ratio: 1/1;
-            max-width: 290px; /* කලින්ට වඩා ටිකක් ලොකු කළා */
-            margin: 25px auto; border-radius: 25px;
-            padding: 18px; /* QR එක වටේට ඉඩ තැබුවා ස්කෑන් කිරීමට පහසු වීමට */
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9); /* QR එක කැපී පේන ලෙස තද හෙවනැල්ලක් */
-            border: 8px solid #FFFFFF; /* පසුබිම තවත් පුළුල් කිරීමට */
+            max-width: 280px; margin: 20px auto; border-radius: 20px;
+            padding: 15px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 8px rgba(255,255,255,0.1);
+            border: 1px solid #ddd;
         }
         
-        /* QR Code එක උපරිම පැහැදිලිව පේන ලෙස */
         #mainQr {
             width: 100%; height: 100%;
             object-fit: contain;
-            image-rendering: pixelated; /* QR එකේ තිත් (pixels) ඉතාම තියුණුව පේන ලෙස */
+            image-rendering: auto;
         }
 
         .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .stat-card { background: rgba(0,0,0,0.4); padding: 15px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .s-val { color: var(--gold); font-size: 18px; font-weight: 700; }
-        .s-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; margin-top: 5px; }
+        .stat-card { background: rgba(0,0,0,0.5); padding: 12px 5px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); }
+        .s-val { color: var(--gold); font-size: 17px; font-weight: 700; }
+        .s-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; margin-top: 4px; }
 
-        .warning-tag { background: #ff4444; color: white; padding: 5px 15px; border-radius: 50px; font-size: 10px; font-weight: bold; margin-top: 15px; display: none; align-self: center; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        .warning-tag { background: #ff4444; color: white; padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: bold; margin-bottom: 10px; align-self: center; animation: blink 1s infinite; display: none; }
+        @keyframes blink { 50% { opacity: 0.4; } }
 
+        /* Form & Management */
         #formOverlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 2000; padding: 30px; flex-direction: column; overflow-y: auto; backdrop-filter: blur(20px);
         }
         input, select {
-            width: 100%; padding: 16px; border-radius: 15px; background: rgba(255,255,255,0.08);
-            border: 1px solid #444; color: white; margin-top: 8px; font-size: 16px;
+            width: 100%; padding: 15px; border-radius: 15px; background: rgba(255,255,255,0.1);
+            border: 1px solid #333; color: white; margin-top: 8px; font-size: 16px;
         }
-        .btn-save { background: var(--gold); color: black; border: none; padding: 18px; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 20px; }
+        .btn-save { background: var(--gold); color: black; border: none; padding: 18px; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 20px; box-shadow: 0 10px 20px rgba(255,215,0,0.2); }
         
         .manage-card {
-            background: var(--glass); padding: 18px; border-radius: 20px;
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px;
             margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .update-bar {
+            background: rgba(0, 242, 255, 0.1); color: var(--accent);
+            padding: 10px; border-radius: 12px; text-align: center;
+            font-size: 11px; margin-top: 20px; border: 1px dashed var(--accent);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -139,14 +145,14 @@
 
     <div id="home" class="view active">
         <div class="v-selector" id="topSelector"></div>
+        <div id="fuelWarn" class="warning-tag">⚠️ LOW FUEL BALANCE</div>
         <div class="card-container" id="mainCard">
             <div class="v-icon-box" id="dispIcon">🚗</div>
-            <p class="v-no-main" id="dispV">EMPTY</p>
-            <div id="fuelWarn" class="warning-tag">LOW FUEL!</div>
+            <p class="v-no-main" id="dispV">NO DATA</p>
             
             <div class="qr-art-frame">
                 <img id="mainQr" src="" style="display:none;">
-                <p id="noQrText" style="color:#666; font-size: 12px; font-family:'Poppins', sans-serif;">Add vehicle in Garage</p>
+                <p id="noQrText" style="color:#888; font-size: 12px; text-align:center;">Add vehicle details in Garage tab</p>
             </div>
             
             <div class="stats-row">
@@ -158,15 +164,20 @@
     </div>
 
     <div id="manage" class="view">
-        <h3 style="color:var(--gold); font-family:'Orbitron'; font-size:14px;">Vehicle Management</h3>
+        <h3 style="color:var(--gold); font-family:'Orbitron'; font-size:14px; margin-bottom:20px;">Vehicle Management</h3>
         <div id="vList"></div>
         <button class="btn-save" onclick="openForm()">+ Add New Vehicle</button>
+        
+        <div class="update-bar" onclick="forceAppUpdate()">
+            ✨ Click here to Check for Updates
+        </div>
     </div>
 
     <div id="formOverlay">
-        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:20px;">Config</h2>
+        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:20px;">Configuration</h2>
         <input type="hidden" id="editIdx" value="-1">
-        <label style="font-size:11px; color:#888;">Vehicle Type</label>
+        
+        <label style="font-size:11px; color:#888; margin-top:10px; display:block;">Vehicle Type</label>
         <select id="inT">
             <option value="🚗">Car (Luxury)</option>
             <option value="🏍️">Motorbike (Sport)</option>
@@ -174,25 +185,52 @@
             <option value="🛺">Tuk Tuk</option>
             <option value="🚛">Truck / Lorry</option>
         </select>
-        <input type="text" id="inV" placeholder="Vehicle Number">
-        <input type="number" id="inQ" placeholder="Weekly Quota (L)">
-        <input type="number" id="inU" placeholder="Used Amount (L)">
-        <input type="file" id="inF" accept="image/*" style="padding:10px;">
-        <button class="btn-save" onclick="saveData()">SAVE VEHICLE</button>
-        <p onclick="hideForm()" style="color:#ff4444; text-align:center; margin-top:20px; cursor:pointer;">Cancel</p>
+        
+        <input type="text" id="inV" placeholder="Vehicle Number (Ex: WP CAD-1234)">
+        <input type="number" id="inQ" placeholder="Weekly Quota (Liters)">
+        <input type="number" id="inU" placeholder="Used Amount (Liters)">
+        
+        <label style="font-size:11px; color:#888; margin-top:15px; display:block;">Upload QR Screenshot</label>
+        <input type="file" id="inF" accept="image/*" style="padding:10px; background:none; border:1px dashed #555;">
+        
+        <button class="btn-save" onclick="saveData()">SAVE & APPLY</button>
+        <p onclick="hideForm()" style="color:#ff4444; text-align:center; margin-top:25px; cursor:pointer; font-weight:600;">Cancel</p>
     </div>
 
     <script>
         const bgImages = {
-            "🚗": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop",
-            "🏍️": "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070&auto=format&fit=crop",
-            "🚐": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop",
-            "🛺": "https://images.unsplash.com/photo-1590130751939-99432f866993?q=80&w=1974&auto=format&fit=crop",
-            "🚛": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2070&auto=format&fit=crop"
+            "🚗": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070",
+            "🏍️": "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070",
+            "🚐": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070",
+            "🛺": "https://images.unsplash.com/photo-1590130751939-99432f866993?q=80&w=1974",
+            "🚛": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2070"
         };
 
-        let vehicles = JSON.parse(localStorage.getItem('fuel_v5_list')) || [];
-        let activeIdx = parseInt(localStorage.getItem('fuel_v5_idx')) || 0;
+        let vehicles = JSON.parse(localStorage.getItem('fuel_vFinal_list')) || [];
+        let activeIdx = parseInt(localStorage.getItem('fuel_vFinal_idx')) || 0;
+
+        // --- Force Update Logic ---
+        function forceAppUpdate() {
+            if(confirm("Checking for updates... The app will reload. Your data will be safe.")) {
+                // Cache එක bypass කර අලුත් එක Load කරයි
+                const cleanURL = window.location.href.split('?')[0];
+                window.location.href = cleanURL + '?update=' + new Date().getTime();
+            }
+        }
+
+        // Auto Check for Update on Focus
+        window.addEventListener('focus', () => {
+            fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
+                .then(res => {
+                    const lastMod = res.headers.get('last-modified');
+                    if (lastMod && localStorage.getItem('last_mod') && lastMod !== localStorage.getItem('last_mod')) {
+                        localStorage.setItem('last_mod', lastMod);
+                        window.location.reload(true);
+                    } else {
+                        localStorage.setItem('last_mod', lastMod);
+                    }
+                }).catch(() => {});
+        });
 
         function switchTab(id, btn) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -205,13 +243,19 @@
         function renderHome() {
             const selector = document.getElementById('topSelector');
             selector.innerHTML = '';
-            if(vehicles.length === 0) return;
+            
+            if(vehicles.length === 0) {
+                document.getElementById('mainCard').style.opacity = '0.3';
+                document.getElementById('dispV').innerText = "EMPTY";
+                return;
+            }
 
+            document.getElementById('mainCard').style.opacity = '1';
             vehicles.forEach((v, idx) => {
                 const chip = document.createElement('div');
                 chip.className = `v-chip ${idx === activeIdx ? 'selected' : ''}`;
                 chip.innerHTML = `${v.type} ${v.no}`;
-                chip.onclick = () => { activeIdx = idx; localStorage.setItem('fuel_v5_idx', idx); renderHome(); };
+                chip.onclick = () => { activeIdx = idx; localStorage.setItem('fuel_vFinal_idx', idx); renderHome(); };
                 selector.appendChild(chip);
             });
 
@@ -225,15 +269,17 @@
             document.getElementById('dispR').innerText = balance + "L";
             document.getElementById('fuelWarn').style.display = (balance <= 2) ? 'block' : 'none';
 
+            // Background change
             document.body.style.backgroundImage = `url('${bgImages[current.type]}')`;
 
+            const qr = document.getElementById('mainQr');
             if(current.qr) { 
-                document.getElementById('mainQr').src = current.qr; 
-                document.getElementById('mainQr').style.display = 'block'; 
+                qr.src = current.qr; 
+                qr.style.display = 'block'; 
                 document.getElementById('noQrText').style.display = 'none'; 
             } else {
-                document.getElementById('mainQr').style.display = 'none'; 
-                document.getElementById('noQrText').style.display = 'block'; 
+                qr.style.display = 'none';
+                document.getElementById('noQrText').style.display = 'block';
             }
         }
 
@@ -244,7 +290,7 @@
                 list.innerHTML += `<div class="manage-card">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div style="font-size:24px;">${v.type}</div>
-                        <div><b style="color:var(--gold)">${v.no}</b><br><small style="opacity:0.5">${v.q-v.u}L Bal</small></div>
+                        <div><b style="color:var(--gold)">${v.no}</b><br><small style="opacity:0.5">${v.q-v.u}L Remaining</small></div>
                     </div>
                     <div>
                         <button onclick="openForm(${idx})" style="background:none; border:1px solid #555; color:white; padding:8px 12px; border-radius:12px; font-size:10px;">EDIT</button>
@@ -277,44 +323,40 @@
             const f = document.getElementById('inF').files[0];
             const idx = parseInt(document.getElementById('editIdx').value);
 
-            if(!no || !q) return alert("Details required!");
+            if(!no || !q) return alert("Vehicle number and Quota are required!");
+
             let vData = idx > -1 ? vehicles[idx] : { no, q, u, type, qr: '' };
             vData.no = no; vData.q = q; vData.u = u; vData.type = type;
 
             if(f) {
                 const reader = new FileReader();
-                reader.onload = e => { vData.qr = e.target.result; if(idx === -1) vehicles.push(vData); finalize(); };
+                reader.onload = e => { 
+                    vData.qr = e.target.result; 
+                    if(idx === -1) vehicles.push(vData); 
+                    finalize(); 
+                };
                 reader.readAsDataURL(f);
-            } else { if(idx === -1) return alert("Upload QR!"); finalize(); }
+            } else {
+                if(idx === -1) return alert("Please upload the QR screenshot!");
+                finalize();
+            }
         }
 
         function finalize() {
-            localStorage.setItem('fuel_v5_list', JSON.stringify(vehicles));
+            localStorage.setItem('fuel_vFinal_list', JSON.stringify(vehicles));
             hideForm(); renderHome(); switchTab('home', document.getElementById('btnH'));
         }
 
         function deleteV(idx) {
-            if(confirm("Remove?")) { vehicles.splice(idx,1); localStorage.setItem('fuel_v5_list', JSON.stringify(vehicles)); renderManage(); }
+            if(confirm("Remove this vehicle?")) { 
+                vehicles.splice(idx,1); 
+                localStorage.setItem('fuel_vFinal_list', JSON.stringify(vehicles)); 
+                if(activeIdx >= vehicles.length) activeIdx = 0;
+                localStorage.setItem('fuel_vFinal_idx', activeIdx);
+                renderManage(); 
+            }
         }
         window.onload = renderHome;
-        // Auto Update Logic - GitHub එකේ වෙනසක් වුණොත් ඇප් එක Refresh කරන්න
-window.addEventListener('focus', () => {
-    // ඇප් එක ඕපන් කරන විට හෝ ඒකට මාරු වන විට (Focus) අලුත් දත්ත තිබේදැයි බලයි
-    fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
-        .then(response => {
-            const lastModified = response.headers.get('last-modified');
-            const savedModified = localStorage.getItem('app_last_modified');
-
-            if (savedModified && lastModified !== savedModified) {
-                localStorage.setItem('app_last_modified', lastModified);
-                // අලුත් Version එකක් ඇවිත් නම් පෝන් එකේ ඇප් එක Reload කරයි
-                window.location.reload(true);
-            } else {
-                localStorage.setItem('app_last_modified', lastModified);
-            }
-        })
-        .catch(err => console.log("Update check failed", err));
-});
     </script>
 </body>
 </html>
