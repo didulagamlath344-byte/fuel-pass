@@ -297,6 +297,24 @@
             if(confirm("Remove?")) { vehicles.splice(idx,1); localStorage.setItem('fuel_v5_list', JSON.stringify(vehicles)); renderManage(); }
         }
         window.onload = renderHome;
+        // Auto Update Logic - GitHub එකේ වෙනසක් වුණොත් ඇප් එක Refresh කරන්න
+window.addEventListener('focus', () => {
+    // ඇප් එක ඕපන් කරන විට හෝ ඒකට මාරු වන විට (Focus) අලුත් දත්ත තිබේදැයි බලයි
+    fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
+        .then(response => {
+            const lastModified = response.headers.get('last-modified');
+            const savedModified = localStorage.getItem('app_last_modified');
+
+            if (savedModified && lastModified !== savedModified) {
+                localStorage.setItem('app_last_modified', lastModified);
+                // අලුත් Version එකක් ඇවිත් නම් පෝන් එකේ ඇප් එක Reload කරයි
+                window.location.reload(true);
+            } else {
+                localStorage.setItem('app_last_modified', lastModified);
+            }
+        })
+        .catch(err => console.log("Update check failed", err));
+});
     </script>
 </body>
 </html>
