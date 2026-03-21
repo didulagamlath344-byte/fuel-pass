@@ -4,119 +4,299 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <title>Smart Fuel Pass Pro</title>
+    <title>Fuel Pass Pro Max</title>
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZ1ZWwgUGFzcyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZ1ZWxQYXNzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmY2MwMCIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi80ODMvNDgzNDk3LnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
     <style>
-        :root { --gold: #ffcc00; --bg: #000; }
-        body { margin: 0; background: var(--bg); font-family: sans-serif; color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Poppins:wght@300;600&display=swap');
+
+        :root {
+            --gold: #FFD700;
+            --accent: #00F2FF;
+            --bg-overlay: rgba(0, 0, 0, 0.7);
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: #000;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            height: 100dvh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            transition: background-image 0.8s ease-in-out;
+        }
+
+        body::before {
+            content: "";
+            position: fixed; inset: 0;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(8px);
+            z-index: -1;
+        }
+
+        .header { padding: 20px 20px 5px; text-align: center; }
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px; letter-spacing: 4px;
+            color: var(--gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .tabs { display: flex; gap: 10px; padding: 10px 20px; }
+        .tab-btn { 
+            flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: var(--glass); color: #aaa; border-radius: 15px;
+            font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px);
+        }
+        .tab-btn.active { background: var(--gold); color: black; border: none; box-shadow: 0 5px 15px rgba(255,215,0,0.4); }
+
+        .v-selector { display: flex; overflow-x: auto; padding: 5px 20px 15px; gap: 12px; scrollbar-width: none; }
+        .v-selector::-webkit-scrollbar { display: none; }
         
-        .tabs { display: flex; background: #111; border-bottom: 1px solid #222; }
-        .tab-btn { flex: 1; padding: 15px; border: none; background: none; color: #888; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
+        .v-chip {
+            padding: 10px 18px; background: var(--glass); border-radius: 20px;
+            white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px; transition: 0.3s; backdrop-filter: blur(10px);
+        }
+        .v-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(0, 242, 255, 0.2); transform: scale(1.05); }
 
-        .view { display: none; flex: 1; overflow-y: auto; padding: 20px; text-align: center; }
-        .view.active { display: flex; flex-direction: column; }
+        .view { display: none; flex: 1; overflow-y: auto; padding: 0 20px 20px; }
+        .view.active { display: flex; flex-direction: column; animation: fadeIn 0.6s ease; }
 
-        /* Card Styles */
-        .v-no { font-size: 40px; font-weight: 900; color: var(--gold); margin-top: 20px; text-transform: uppercase; }
-        .qr-frame { background: white; width: 90vw; height: 90vw; max-width: 350px; margin: 20px auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        #qrImg { width: 100%; height: 100%; object-fit: contain; }
-        .stats { display: flex; justify-content: space-around; margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; }
-        .s-val { color: var(--gold); font-size: 20px; font-weight: bold; }
-        .s-lbl { font-size: 10px; opacity: 0.6; margin-top: 5px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Edit Styles */
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; font-size: 16px; }
-        .save-btn { width: 100%; padding: 18px; background: var(--gold); border: none; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
-        label { display: block; text-align: left; font-size: 12px; color: #888; margin-top: 10px; }
+        /* Premium Card Container - Blurry Background */
+        .card-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(25px);
+            border-radius: 35px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .v-icon-box { font-size: 50px; margin-bottom: 5px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.4)); }
+        .v-no-main { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; margin: 0; color: #fff; letter-spacing: 2px; }
+
+        /* QR Area - විශේෂයෙන්ම දියුණු කළ කොටස */
+        .qr-art-frame {
+            background: #FFFFFF; /* නියම සුදු පාට පසුබිම (No transparency/glass effect) */
+            width: 100%; aspect-ratio: 1/1;
+            max-width: 290px; /* කලින්ට වඩා ටිකක් ලොකු කළා */
+            margin: 25px auto; border-radius: 25px;
+            padding: 18px; /* QR එක වටේට ඉඩ තැබුවා ස්කෑන් කිරීමට පහසු වීමට */
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9); /* QR එක කැපී පේන ලෙස තද හෙවනැල්ලක් */
+            border: 8px solid #FFFFFF; /* පසුබිම තවත් පුළුල් කිරීමට */
+        }
+        
+        /* QR Code එක උපරිම පැහැදිලිව පේන ලෙස */
+        #mainQr {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated; /* QR එකේ තිත් (pixels) ඉතාම තියුණුව පේන ලෙස */
+        }
+
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .stat-card { background: rgba(0,0,0,0.4); padding: 15px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .s-val { color: var(--gold); font-size: 18px; font-weight: 700; }
+        .s-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; margin-top: 5px; }
+
+        .warning-tag { background: #ff4444; color: white; padding: 5px 15px; border-radius: 50px; font-size: 10px; font-weight: bold; margin-top: 15px; display: none; align-self: center; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        #formOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96);
+            z-index: 2000; padding: 30px; flex-direction: column; overflow-y: auto; backdrop-filter: blur(20px);
+        }
+        input, select {
+            width: 100%; padding: 16px; border-radius: 15px; background: rgba(255,255,255,0.08);
+            border: 1px solid #444; color: white; margin-top: 8px; font-size: 16px;
+        }
+        .btn-save { background: var(--gold); color: black; border: none; padding: 18px; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 20px; }
+        
+        .manage-card {
+            background: var(--glass); padding: 18px; border-radius: 20px;
+            margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body>
 
+    <div class="header"><div class="logo-text">FUEL PASS PRO</div></div>
+
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('card', this)">MY CARD</button>
-        <button class="tab-btn" onclick="switchTab('edit', this)">EDIT DATA</button>
+        <button class="tab-btn active" id="btnH" onclick="switchTab('home', this)">MY CARD</button>
+        <button class="tab-btn" id="btnM" onclick="switchTab('manage', this)">GARAGE</button>
     </div>
 
-    <div id="card" class="view active">
-        <p class="v-no" id="dispV">BGW-0898</p>
-        <div class="qr-frame">
-            <img id="qrImg" src="" alt="Fuel QR">
-            <p id="noQrText" style="color:#888; display:none;">QR එක ඇතුළත් කර නැත</p>
-        </div>
-        <div class="stats">
-            <div><div class="s-val" id="dispQ">0L</div><div class="s-lbl">QUOTA</div></div>
-            <div style="border-left:1px solid #333; border-right:1px solid #333; padding:0 20px;"><div class="s-val" id="dispU">0L</div><div class="s-lbl">USED</div></div>
-            <div><div class="s-val" id="dispR" style="color:#00ff88;">0L</div><div class="s-lbl">REM</div></div>
+    <div id="home" class="view active">
+        <div class="v-selector" id="topSelector"></div>
+        <div class="card-container" id="mainCard">
+            <div class="v-icon-box" id="dispIcon">🚗</div>
+            <p class="v-no-main" id="dispV">EMPTY</p>
+            <div id="fuelWarn" class="warning-tag">LOW FUEL!</div>
+            
+            <div class="qr-art-frame">
+                <img id="mainQr" src="" style="display:none;">
+                <p id="noQrText" style="color:#666; font-size: 12px; font-family:'Poppins', sans-serif;">Add vehicle in Garage</p>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-card"><div class="s-val" id="dispQ">0L</div><div class="s-lbl">Quota</div></div>
+                <div class="stat-card"><div class="s-val" id="dispU">0L</div><div class="s-lbl">Used</div></div>
+                <div class="stat-card" style="border: 1px solid rgba(0,255,136,0.2)"><div class="s-val" id="dispR" style="color:#00ff88">0L</div><div class="s-lbl">Bal</div></div>
+            </div>
         </div>
     </div>
 
-    <div id="edit" class="view">
-        <h3 style="color:var(--gold); margin-top:0;">පසුගිය විස්තර යාවත්කාලීන කරන්න</h3>
-        <label>වාහන අංකය</label><input type="text" id="inV">
-        <label>මුළු සතිපතා Quota (L)</label><input type="number" id="inQ">
-        <label>මේ සතියේ පාවිච්චි කළ ප්‍රමාණය (L)</label><input type="number" id="inU">
-        <label>QR Screenshot එක තෝරන්න</label><input type="file" id="inF" accept="image/*">
-        <button class="save-btn" onclick="saveData()">SAVE & UPDATE</button>
-        <p style="font-size:11px; color:#666; margin-top:20px;">මෙම දත්ත ඔබගේ දුරකථනයේ පමණක් සුරැකේ.</p>
+    <div id="manage" class="view">
+        <h3 style="color:var(--gold); font-family:'Orbitron'; font-size:14px;">Vehicle Management</h3>
+        <div id="vList"></div>
+        <button class="btn-save" onclick="openForm()">+ Add New Vehicle</button>
+    </div>
+
+    <div id="formOverlay">
+        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:20px;">Config</h2>
+        <input type="hidden" id="editIdx" value="-1">
+        <label style="font-size:11px; color:#888;">Vehicle Type</label>
+        <select id="inT">
+            <option value="🚗">Car (Luxury)</option>
+            <option value="🏍️">Motorbike (Sport)</option>
+            <option value="🚐">Van / SUV</option>
+            <option value="🛺">Tuk Tuk</option>
+            <option value="🚛">Truck / Lorry</option>
+        </select>
+        <input type="text" id="inV" placeholder="Vehicle Number">
+        <input type="number" id="inQ" placeholder="Weekly Quota (L)">
+        <input type="number" id="inU" placeholder="Used Amount (L)">
+        <input type="file" id="inF" accept="image/*" style="padding:10px;">
+        <button class="btn-save" onclick="saveData()">SAVE VEHICLE</button>
+        <p onclick="hideForm()" style="color:#ff4444; text-align:center; margin-top:20px; cursor:pointer;">Cancel</p>
     </div>
 
     <script>
-        const store = { v: 'f_v', q: 'f_q', u: 'f_u', i: 'f_i' };
+        const bgImages = {
+            "🚗": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop",
+            "🏍️": "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070&auto=format&fit=crop",
+            "🚐": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop",
+            "🛺": "https://images.unsplash.com/photo-1590130751939-99432f866993?q=80&w=1974&auto=format&fit=crop",
+            "🚛": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=2070&auto=format&fit=crop"
+        };
 
-        function switchTab(tabId, btn) {
+        let vehicles = JSON.parse(localStorage.getItem('fuel_v5_list')) || [];
+        let activeIdx = parseInt(localStorage.getItem('fuel_v5_idx')) || 0;
+
+        function switchTab(id, btn) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-            if(tabId === 'card') loadData();
+            id === 'home' ? renderHome() : renderManage();
         }
 
-        function loadData() {
-            const v = localStorage.getItem(store.v) || "--- ---";
-            const q = parseFloat(localStorage.getItem(store.q)) || 0;
-            const u = parseFloat(localStorage.getItem(store.u)) || 0;
-            const img = localStorage.getItem(store.i);
+        function renderHome() {
+            const selector = document.getElementById('topSelector');
+            selector.innerHTML = '';
+            if(vehicles.length === 0) return;
 
-            document.getElementById('dispV').innerText = v;
-            document.getElementById('dispQ').innerText = q + "L";
-            document.getElementById('dispU').innerText = u + "L";
-            document.getElementById('dispR').innerText = (q - u) + "L";
+            vehicles.forEach((v, idx) => {
+                const chip = document.createElement('div');
+                chip.className = `v-chip ${idx === activeIdx ? 'selected' : ''}`;
+                chip.innerHTML = `${v.type} ${v.no}`;
+                chip.onclick = () => { activeIdx = idx; localStorage.setItem('fuel_v5_idx', idx); renderHome(); };
+                selector.appendChild(chip);
+            });
 
-            if(img) {
-                document.getElementById('qrImg').src = img;
-                document.getElementById('qrImg').style.display = 'block';
-                document.getElementById('noQrText').style.display = 'none';
+            const current = vehicles[activeIdx] || vehicles[0];
+            const balance = current.q - current.u;
+            
+            document.getElementById('dispV').innerText = current.no;
+            document.getElementById('dispIcon').innerText = current.type;
+            document.getElementById('dispQ').innerText = current.q + "L";
+            document.getElementById('dispU').innerText = current.u + "L";
+            document.getElementById('dispR').innerText = balance + "L";
+            document.getElementById('fuelWarn').style.display = (balance <= 2) ? 'block' : 'none';
+
+            document.body.style.backgroundImage = `url('${bgImages[current.type]}')`;
+
+            if(current.qr) { 
+                document.getElementById('mainQr').src = current.qr; 
+                document.getElementById('mainQr').style.display = 'block'; 
+                document.getElementById('noQrText').style.display = 'none'; 
             } else {
-                document.getElementById('qrImg').style.display = 'none';
-                document.getElementById('noQrText').style.display = 'block';
+                document.getElementById('mainQr').style.display = 'none'; 
+                document.getElementById('noQrText').style.display = 'block'; 
             }
         }
 
+        function renderManage() {
+            const list = document.getElementById('vList');
+            list.innerHTML = '';
+            vehicles.forEach((v, idx) => {
+                list.innerHTML += `<div class="manage-card">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="font-size:24px;">${v.type}</div>
+                        <div><b style="color:var(--gold)">${v.no}</b><br><small style="opacity:0.5">${v.q-v.u}L Bal</small></div>
+                    </div>
+                    <div>
+                        <button onclick="openForm(${idx})" style="background:none; border:1px solid #555; color:white; padding:8px 12px; border-radius:12px; font-size:10px;">EDIT</button>
+                        <button onclick="deleteV(${idx})" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:8px 12px; border-radius:12px; font-size:10px; margin-left:5px;">X</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function openForm(idx = -1) {
+            document.getElementById('formOverlay').style.display = 'flex';
+            if(idx > -1) {
+                const v = vehicles[idx];
+                document.getElementById('inV').value = v.no; document.getElementById('inQ').value = v.q;
+                document.getElementById('inU').value = v.u; document.getElementById('inT').value = v.type;
+                document.getElementById('editIdx').value = idx;
+            } else {
+                document.getElementById('editIdx').value = -1;
+                document.getElementById('inV').value = ''; document.getElementById('inQ').value = ''; document.getElementById('inU').value = '0';
+            }
+        }
+
+        function hideForm() { document.getElementById('formOverlay').style.display = 'none'; }
+
         function saveData() {
-            const v = document.getElementById('inV').value;
+            const no = document.getElementById('inV').value.toUpperCase();
             const q = document.getElementById('inQ').value;
             const u = document.getElementById('inU').value;
+            const type = document.getElementById('inT').value;
             const f = document.getElementById('inF').files[0];
+            const idx = parseInt(document.getElementById('editIdx').value);
 
-            if(v) localStorage.setItem(store.v, v.toUpperCase());
-            if(q) localStorage.setItem(store.q, q);
-            if(u) localStorage.setItem(store.u, u);
+            if(!no || !q) return alert("Details required!");
+            let vData = idx > -1 ? vehicles[idx] : { no, q, u, type, qr: '' };
+            vData.no = no; vData.q = q; vData.u = u; vData.type = type;
 
             if(f) {
                 const reader = new FileReader();
-                reader.onload = e => {
-                    localStorage.setItem(store.i, e.target.result);
-                    alert("සියල්ල සුරැකුණි!");
-                    switchTab('card', document.querySelector('.tab-btn'));
-                };
+                reader.onload = e => { vData.qr = e.target.result; if(idx === -1) vehicles.push(vData); finalize(); };
                 reader.readAsDataURL(f);
-            } else {
-                alert("විස්තර යාවත්කාලීන විය!");
-                switchTab('card', document.querySelector('.tab-btn'));
-            }
+            } else { if(idx === -1) return alert("Upload QR!"); finalize(); }
         }
-        window.onload = loadData;
+
+        function finalize() {
+            localStorage.setItem('fuel_v5_list', JSON.stringify(vehicles));
+            hideForm(); renderHome(); switchTab('home', document.getElementById('btnH'));
+        }
+
+        function deleteV(idx) {
+            if(confirm("Remove?")) { vehicles.splice(idx,1); localStorage.setItem('fuel_v5_list', JSON.stringify(vehicles)); renderManage(); }
+        }
+        window.onload = renderHome;
     </script>
 </body>
 </html>
