@@ -4,146 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <title>Fuel Pass Pro Max+ </title>
+    <title>Fuel Pass Premium</title>
     
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZ1ZWwgUGFzcyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZ1ZWxQYXNzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmY2MwMCIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi80ODMvNDgzNDk3LnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Poppins:wght@300;600&display=swap');
 
         :root {
             --gold: #FFD700;
             --accent: #00F2FF;
-            --bg-overlay: rgba(0, 0, 0, 0.85);
-            --glass: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none;}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0; padding: 0;
-            background-color: #000;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-attachment: fixed;
+            /* අලුත් ලස්සන අඳුරු පසුබිමක් */
+            background: #000 url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000') center/cover no-repeat fixed;
             font-family: 'Poppins', sans-serif;
             color: white;
             height: 100dvh;
             display: flex; flex-direction: column;
             overflow: hidden;
-            transition: background-image 0.8s ease;
         }
 
         body::before {
             content: "";
             position: fixed; inset: 0;
-            background: var(--bg-overlay);
-            backdrop-filter: blur(12px);
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%);
+            backdrop-filter: blur(15px);
             z-index: -1;
         }
 
-        .header { padding: 10px 10px 2px; text-align: center; }
-        .logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px; letter-spacing: 3px;
-            color: var(--gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            margin: 0; opacity: 0.8;
+        .header { padding: 12px; text-align: center; }
+        .logo-text { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 12px; 
+            color: var(--gold); 
+            letter-spacing: 5px; 
+            margin: 0;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         }
 
-        .tabs { display: flex; gap: 8px; padding: 5px 15px; }
+        .tabs { display: flex; gap: 10px; padding: 5px 20px; }
         .tab-btn { 
-            flex: 1; padding: 8px; border: 1px solid rgba(255,255,255,0.1);
-            background: var(--glass); color: #888; border-radius: 10px;
+            flex: 1; padding: 10px; 
+            background: var(--glass); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: #777; border-radius: 12px; 
             font-size: 10px; font-weight: 600; cursor: pointer;
         }
-        .tab-btn.active { background: var(--gold); color: black; border: none; box-shadow: 0 4px 10px rgba(255,215,0,0.3); }
+        .tab-btn.active { background: var(--gold); color: black; border: none; box-shadow: 0 0 20px rgba(255,215,0,0.3); }
 
-        .v-selector { display: flex; overflow-x: auto; padding: 5px 15px; gap: 8px; scrollbar-width: none; }
+        .v-selector { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; scrollbar-width: none; }
         .v-selector::-webkit-scrollbar { display: none; }
-        
-        .v-chip {
-            padding: 6px 12px; background: var(--glass); border-radius: 15px;
-            white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);
-            font-size: 10px; transition: 0.3s;
+        .v-chip { 
+            padding: 7px 15px; background: rgba(255,255,255,0.03); 
+            border-radius: 20px; font-size: 11px; white-space: nowrap; 
+            border: 1px solid rgba(255,255,255,0.05); 
         }
-        .v-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(0, 242, 255, 0.15); }
+        .v-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(0, 242, 255, 0.1); }
 
-        .view { display: none; flex: 1; padding: 0 10px 10px; flex-direction: column; }
-        .view.active { display: flex; animation: fadeIn 0.4s ease; }
+        .view { display: none; flex: 1; padding: 0 20px 20px; flex-direction: column; }
+        .view.active { display: flex; animation: slideUp 0.4s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Full Screen Optimized Card --- */
+        /* Main Card Design */
         .card-container {
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
             border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 15px 10px;
+            border-radius: 30px;
+            padding: 20px 15px;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        .v-info-top { margin-bottom: 5px; }
-        .v-icon-box { font-size: 30px; margin-bottom: 0px; }
-        .v-no-main { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; margin: 0; color: #fff; letter-spacing: 1px; }
+        .v-no-main { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 24px; font-weight: 900; 
+            color: #fff; margin: 0; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
 
-        /* --- MAXIMUM QR AREA --- */
+        /* Maximum QR Area with Reset Logic */
         .qr-art-frame {
             background: #FFFFFF;
-            width: 85vw; 
-            height: 85vw; 
-            max-width: 340px; 
-            max-height: 340px;
-            margin: 5px auto; 
-            border-radius: 20px;
-            padding: 10px; 
+            width: 78vw; height: 78vw;
+            max-width: 320px; max-height: 320px;
+            margin: 15px auto;
+            border-radius: 25px;
+            padding: 12px;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px rgba(255,255,255,0.2);
-            border: 10px solid #FFFFFF; /* සුදු බෝඩරය වැඩිකළා ස්කෑනරයට ලේසි වෙන්න */
+            border: 12px solid #FFFFFF;
+            box-shadow: 0 0 35px rgba(255,255,255,0.1);
         }
-        
-        #mainQr {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            image-rendering: auto;
+        #mainQr { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Sunday Reset Message */
+        .reset-note { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* Stats Section */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-card { 
+            background: rgba(0,0,0,0.4); 
+            padding: 12px 5px; border-radius: 18px; 
+            border: 1px solid rgba(255,255,255,0.03); 
         }
+        .s-val { color: var(--gold); font-size: 18px; font-weight: 700; display: block; }
+        .s-lbl { font-size: 8px; opacity: 0.4; text-transform: uppercase; margin-top: 4px; }
+        .bal-val { color: #00ff88 !important; }
 
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 5px; }
-        .stat-card { background: rgba(0,0,0,0.6); padding: 8px 2px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .s-val { color: var(--gold); font-size: 15px; font-weight: 700; }
-        .s-lbl { font-size: 8px; opacity: 0.5; text-transform: uppercase; }
-
-        #fuelWarn { background: #ff4444; color: white; padding: 2px 10px; border-radius: 50px; font-size: 9px; font-weight: bold; align-self: center; margin-bottom: 5px; animation: blink 1s infinite; display: none; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-
-        /* Management & Form */
-        #vList { overflow-y: auto; flex: 1; margin-bottom: 10px; }
+        /* Manage View */
         .manage-card {
-            background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px;
-            margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .btn-save { 
+            background: var(--gold); color: black; border: none; 
+            padding: 18px; border-radius: 20px; font-weight: 900; 
+            width: 100%; cursor: pointer; margin-top: 20px;
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
         }
 
         #formOverlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
-            z-index: 2000; padding: 20px; flex-direction: column; overflow-y: auto;
+            z-index: 2000; padding: 25px; flex-direction: column; backdrop-filter: blur(20px);
         }
         input, select {
-            width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.08);
-            border: 1px solid #333; color: white; margin-top: 5px; font-size: 14px;
+            width: 100%; padding: 15px; border-radius: 15px; 
+            background: rgba(255,255,255,0.07); border: 1px solid #333; 
+            color: white; margin-top: 10px; font-size: 15px;
         }
-        .btn-save { background: var(--gold); color: black; border: none; padding: 15px; border-radius: 15px; font-weight: 900; width: 100%; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="header"><p class="logo-text">FUEL PASS PRO</p></div>
+    <div class="header"><p class="logo-text">FUEL PASS PREMIMUM</p></div>
 
     <div class="tabs">
         <button class="tab-btn active" id="btnH" onclick="switchTab('home', this)">MY CARD</button>
@@ -153,81 +154,74 @@
     <div id="home" class="view active">
         <div class="v-selector" id="topSelector"></div>
         
-        <div class="card-container" id="mainCard">
-            <div class="v-info-top">
-                <div class="v-icon-box" id="dispIcon">🚗</div>
-                <p class="v-no-main" id="dispV">NO DATA</p>
-                <div id="fuelWarn">⚠️ LOW BALANCE</div>
+        <div class="card-container">
+            <div>
+                <p class="v-no-main" id="dispV">WP CAD-1234</p>
+                <p class="reset-note" id="resetLabel">Weekly Quota Resetting...</p>
             </div>
             
             <div class="qr-art-frame">
                 <img id="mainQr" src="" style="display:none;">
-                <p id="noQrText" style="color:#666; font-size: 11px;">Add QR in Garage</p>
+                <p id="noQrText" style="color:#444; font-size: 11px;">Upload QR Image</p>
             </div>
             
             <div class="stats-row">
-                <div class="stat-card"><div class="s-val" id="dispQ">0L</div><div class="s-lbl">Quota</div></div>
-                <div class="stat-card"><div class="s-val" id="dispU">0L</div><div class="s-lbl">Used</div></div>
-                <div class="stat-card" style="border: 1px solid rgba(0,255,136,0.15)"><div class="s-val" id="dispR" style="color:#00ff88">0L</div><div class="s-lbl">Bal</div></div>
+                <div class="stat-card"><span class="s-val" id="dispQ">20L</span><span class="s-lbl">Quota</span></div>
+                <div class="stat-card"><span class="s-val" id="dispU" style="color:#ff5555">0L</span><span class="s-lbl">Used</span></div>
+                <div class="stat-card"><span class="s-val bal-val" id="dispR">20L</span><span class="s-lbl">Balance</span></div>
             </div>
         </div>
     </div>
 
     <div id="manage" class="view">
-        <h3 style="color:var(--gold); font-family:'Orbitron'; font-size:12px;">Manage Vehicles</h3>
-        <div id="vList"></div>
-        <button class="btn-save" onclick="openForm()">+ Add New Vehicle</button>
-        <p onclick="forceAppUpdate()" style="color:var(--accent); font-size:10px; text-align:center; margin-top:15px; opacity:0.6; cursor:pointer;">Check for Updates</p>
+        <div id="vList" style="flex:1; overflow-y:auto;"></div>
+        <button class="btn-save" onclick="openForm()">+ ADD VEHICLE</button>
+        <p onclick="forceAppUpdate()" style="text-align:center; font-size:10px; color:var(--accent); margin-top:15px; opacity:0.5;">Update Available? Refresh</p>
     </div>
 
     <div id="formOverlay">
-        <h2 style="font-family:'Orbitron'; color:var(--gold); font-size:18px;">Settings</h2>
+        <h2 style="font-family:'Orbitron'; color:var(--gold); text-align:center; font-size:22px;">CONFIGURATION</h2>
         <input type="hidden" id="editIdx" value="-1">
         <select id="inT">
-            <option value="🚗">Car</option>
-            <option value="🏍️">Motorbike</option>
-            <option value="🚐">Van</option>
-            <option value="🛺">Tuk Tuk</option>
-            <option value="🚛">Truck</option>
+            <option value="🚗">Car</option><option value="🏍️">Motorbike</option><option value="🚐">Van</option><option value="🛺">Tuk Tuk</option><option value="🚛">Truck</option>
         </select>
         <input type="text" id="inV" placeholder="Vehicle Number">
-        <input type="number" id="inQ" placeholder="Weekly Quota">
-        <input type="number" id="inU" placeholder="Used Amount">
-        <label style="font-size:10px; color:#666; margin-top:10px; display:block;">QR Image / Screenshot</label>
-        <input type="file" id="inF" accept="image/*">
-        <button class="btn-save" onclick="saveData()">SAVE</button>
-        <p onclick="hideForm()" style="color:#ff4444; text-align:center; margin-top:20px; cursor:pointer;">Cancel</p>
+        <input type="number" id="inQ" placeholder="Total Weekly Quota">
+        <input type="number" id="inU" placeholder="Used Amount So Far">
+        <label style="font-size:11px; color:#777; margin-top:15px; display:block;">Select QR Image</label>
+        <input type="file" id="inF" accept="image/*" style="border:none; background:none;">
+        <button class="btn-save" onclick="saveData()">SAVE DETAILS</button>
+        <p onclick="hideForm()" style="color:#ff4444; text-align:center; margin-top:25px; cursor:pointer; font-weight:600;">CANCEL</p>
     </div>
 
     <script>
-        const bgImages = {
-            "🚗": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000",
-            "🏍️": "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=1000",
-            "🚐": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000",
-            "🛺": "https://images.unsplash.com/photo-1590130751939-99432f866993?q=80&w=1000",
-            "🚛": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=1000"
-        };
-
+        // දත්ත ලබාගැනීම (කලින් කෝඩ් එකේ තිබුණු Key එකමයි)
         let vehicles = JSON.parse(localStorage.getItem('f_v_final_list')) || [];
         let activeIdx = parseInt(localStorage.getItem('f_v_final_idx')) || 0;
 
+        // --- Sunday Auto Reset Logic ---
+        function checkWeeklyReset() {
+            const now = new Date();
+            const lastReset = localStorage.getItem('last_reset_date_premium');
+            const currentDay = now.getDay(); // 0 = Sunday
+            const todayStr = now.toDateString();
+
+            if (currentDay === 0 && lastReset !== todayStr) {
+                vehicles.forEach(v => { v.u = 0; });
+                localStorage.setItem('f_v_final_list', JSON.stringify(vehicles));
+                localStorage.setItem('last_reset_date_premium', todayStr);
+                document.getElementById('resetLabel').innerText = "Quota Reset for New Week!";
+            } else {
+                document.getElementById('resetLabel').innerText = "Next Reset: Sunday 06:00 AM";
+            }
+        }
+
         function forceAppUpdate() {
-            if(confirm("Refresh app?")) {
+            if(confirm("Refresh app for latest updates?")) {
                 const url = window.location.href.split('?')[0];
                 window.location.href = url + '?v=' + new Date().getTime();
             }
         }
-
-        window.addEventListener('focus', () => {
-            fetch(window.location.href, { method: 'HEAD', cache: 'no-cache' })
-                .then(res => {
-                    const lm = res.headers.get('last-modified');
-                    if (lm && localStorage.getItem('app_lm') && lm !== localStorage.getItem('app_lm')) {
-                        localStorage.setItem('app_lm', lm);
-                        window.location.reload(true);
-                    } else { localStorage.setItem('app_lm', lm); }
-                }).catch(() => {});
-        });
 
         function switchTab(id, btn) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -238,9 +232,13 @@
         }
 
         function renderHome() {
+            checkWeeklyReset();
             const selector = document.getElementById('topSelector');
             selector.innerHTML = '';
-            if(vehicles.length === 0) return;
+            if(vehicles.length === 0) {
+                document.getElementById('dispV').innerText = "NO DATA";
+                return;
+            }
 
             vehicles.forEach((v, idx) => {
                 const chip = document.createElement('div');
@@ -253,12 +251,9 @@
             const v = vehicles[activeIdx] || vehicles[0];
             const bal = v.q - v.u;
             document.getElementById('dispV').innerText = v.no;
-            document.getElementById('dispIcon').innerText = v.type;
             document.getElementById('dispQ').innerText = v.q + "L";
             document.getElementById('dispU').innerText = v.u + "L";
             document.getElementById('dispR').innerText = bal + "L";
-            document.getElementById('fuelWarn').style.display = (bal <= 2) ? 'block' : 'none';
-            document.body.style.backgroundImage = `url('${bgImages[v.type]}')`;
 
             const qr = document.getElementById('mainQr');
             if(v.qr) { qr.src = v.qr; qr.style.display = 'block'; document.getElementById('noQrText').style.display = 'none'; }
@@ -269,10 +264,10 @@
             list.innerHTML = '';
             vehicles.forEach((v, idx) => {
                 list.innerHTML += `<div class="manage-card">
-                    <div><b style="color:var(--gold)">${v.no}</b><br><small style="opacity:0.5">${v.type}</small></div>
+                    <div><b style="color:var(--gold)">${v.no}</b><br><small style="opacity:0.4">${v.type} | ${v.q}L</small></div>
                     <div>
-                        <button onclick="openForm(${idx})" style="background:none; border:1px solid #555; color:white; padding:5px 8px; border-radius:8px; font-size:9px;">EDIT</button>
-                        <button onclick="deleteV(${idx})" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:5px 8px; border-radius:8px; font-size:9px;">X</button>
+                        <button onclick="openForm(${idx})" style="background:none; border:1px solid #555; color:white; padding:8px 12px; border-radius:12px; font-size:10px;">EDIT</button>
+                        <button onclick="deleteV(${idx})" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:8px 12px; border-radius:12px; font-size:10px; margin-left:5px;">X</button>
                     </div>
                 </div>`;
             });
@@ -300,7 +295,7 @@
             const type = document.getElementById('inT').value;
             const f = document.getElementById('inF').files[0];
             const idx = parseInt(document.getElementById('editIdx').value);
-            if(!no || !q) return alert("Fill all!");
+            if(!no || !q) return alert("Fill all details!");
 
             let vData = idx > -1 ? vehicles[idx] : { no, q, u, type, qr: '' };
             vData.no = no; vData.q = q; vData.u = u; vData.type = type;
@@ -309,7 +304,7 @@
                 const reader = new FileReader();
                 reader.onload = e => { vData.qr = e.target.result; if(idx === -1) vehicles.push(vData); finalize(); };
                 reader.readAsDataURL(f);
-            } else { if(idx === -1) return alert("Upload QR!"); finalize(); }
+            } else { if(idx === -1) return alert("Upload QR Image!"); finalize(); }
         }
 
         function finalize() {
@@ -318,7 +313,11 @@
         }
 
         function deleteV(idx) {
-            if(confirm("Remove?")) { vehicles.splice(idx,1); localStorage.setItem('f_v_final_list', JSON.stringify(vehicles)); renderManage(); }
+            if(confirm("Remove this vehicle?")) { 
+                vehicles.splice(idx,1); 
+                localStorage.setItem('f_v_final_list', JSON.stringify(vehicles)); 
+                renderManage(); 
+            }
         }
         window.onload = renderHome;
     </script>
