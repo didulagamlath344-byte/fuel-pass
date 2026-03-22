@@ -1,183 +1,46 @@
 <!DOCTYPE html>
-<html lang="si">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/483/483497.png">
-
-    <link rel="manifest" href='data:application/json,{"id":"fuelpass-v31","name":"Fuel Pass Pro","short_name":"FuelPass","start_url":"index.html","display":"standalone","background_color":"#000000","theme_color":"#ffd700","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/483/483497.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
-
-    <title>Fuel Pass Pro v3.1</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <title>Fuel Pro</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Poppins:wght@300;600&display=swap');
-        :root { --gold: #FFD700; --red: #ff4444; --glass: rgba(255, 255, 255, 0.05); }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            margin: 0; background: #000; font-family: 'Poppins', sans-serif; color: white;
-            height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-            padding-top: env(safe-area-inset-top);
-        }
-
-        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo-text { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--gold); margin: 0; }
-        
-        .btn-upd { background: rgba(255,215,0,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 5px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; }
-
-        .tabs { display: flex; gap: 10px; padding: 10px 15px; }
-        .tab-btn { flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: #777; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .tab-btn.active { background: var(--gold); color: black; border: none; }
-
-        .view { display: none; flex: 1; flex-direction: column; align-items: center; justify-content: space-evenly; padding: 20px; }
-        .view.active { display: flex; }
-
-        .qr-frame {
-            background: #fff; width: 85vw; height: 85vw; max-width: 350px; max-height: 350px;
-            border-radius: 20px; padding: 15px; display: flex; align-items: center; justify-content: center;
-        }
-        #mainQr { width: 100%; height: 100%; object-fit: contain; }
-
-        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .s-card { background: #111; padding: 15px 5px; border-radius: 15px; text-align: center; border: 1px solid #222; }
-        .s-v { color: var(--gold); font-size: 1.2rem; font-weight: 700; display: block; }
-        .s-l { font-size: 0.6rem; opacity: 0.5; }
-
-        #vList { width: 100%; overflow-y: auto; padding: 15px; }
-        .v-card { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-
-        .btn-save { background: var(--gold); color: black; border: none; padding: 18px; border-radius: 18px; font-weight: 900; width: 90%; font-family: 'Orbitron'; cursor: pointer; }
-
-        #overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 100; padding: 30px; flex-direction: column; justify-content: center; }
-        input, select { width: 100%; padding: 15px; border-radius: 12px; background: #111; border: 1px solid #333; color: white; margin-bottom: 15px; }
+        body { background: #000; color: #ffd700; font-family: sans-serif; text-align: center; padding: 50px; }
+        #status { font-size: 12px; color: #555; margin-top: 20px; }
+        .btn { background: #ffd700; padding: 15px; border-radius: 10px; width: 100%; border:none; font-weight:bold; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <div>
-            <p class="logo-text">FUEL PASS PRO</p>
-            <span style="font-size: 0.5rem; opacity: 0.4;">STABLE V3.1</span>
-        </div>
-        <button class="btn-upd" onclick="checkUpdate()">CHECK UPDATE</button>
+    <h1>FUEL PASS PRO</h1>
+    <p id="msg">පද්ධතිය පරීක්ෂා කරමින්...</p>
+    
+    <div style="border: 1px solid #333; padding: 20px; border-radius: 15px;">
+        <input type="text" id="v" placeholder="Vehicle No" style="width:90%; padding:10px; margin-bottom:10px;">
+        <button class="btn" onclick="save()">SAVE DATA</button>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" id="btnH" onclick="tab('home', this)">MY CARD</button>
-        <button class="tab-btn" id="btnM" onclick="tab('manage', this)">GARAGE</button>
-    </div>
-
-    <div id="home" class="view active">
-        <h2 id="dispV" style="margin:0; font-family:'Orbitron';">NO VEHICLE</h2>
-        <div class="qr-frame">
-            <img id="mainQr" src="" style="display:none;">
-            <p id="noQr" style="color:#000; font-weight:bold;">UPLOAD QR</p>
-        </div>
-        <div class="stats-row">
-            <div class="s-card"><span class="s-v" id="dispQ">0L</span><span class="s-l">Quota</span></div>
-            <div class="s-card"><span class="s-v" id="dispU" style="color:var(--red)">0L</span><span class="s-l">Used</span></div>
-            <div class="s-card"><span class="s-v" id="dispR" style="color:#00ff88">0L</span><span class="s-l">Remain</span></div>
-        </div>
-    </div>
-
-    <div id="manage" class="view">
-        <div id="vList"></div>
-        <button class="btn-save" onclick="showForm()">+ ADD VEHICLE</button>
-    </div>
-
-    <div id="overlay">
-        <h2 style="color:var(--gold); text-align:center;">SETTINGS</h2>
-        <select id="inT"><option>🚗 Car</option><option>🏍️ Bike</option><option>🛺 Tuk</option><option>🚐 Van</option></select>
-        <input type="text" id="inV" placeholder="Vehicle No">
-        <input type="number" id="inQ" placeholder="Quota (L)">
-        <input type="number" id="inU" placeholder="Used (L)">
-        <input type="file" id="inF" accept="image/*">
-        <button class="btn-save" onclick="saveData()">SAVE</button>
-        <p onclick="hideForm()" style="text-align:center; color:red; margin-top:20px; font-weight:bold;">CANCEL</p>
-    </div>
+    <div id="status">Checking PWA Status...</div>
 
     <script>
-        // Check for Update
-        function checkUpdate() {
-            if (confirm("Update එකක් තිබේදැයි පරීක්ෂා කරමුද? දත්ත මැකෙන්නේ නැත.")) {
-                window.location.reload(true);
-            }
-        }
-
-        // Service Worker (App එකක් වීමට අනිවාර්යයි)
+        // Service Worker ලියාපදිංචිය
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
-                const blob = new Blob([swCode], {type: 'text/javascript'});
-                navigator.serviceWorker.register(URL.createObjectURL(blob));
-            });
+            navigator.serviceWorker.register('sw.js')
+            .then(() => { document.getElementById('status').innerText = "✅ Service Worker: Active"; })
+            .catch(() => { document.getElementById('status').innerText = "❌ SW Error"; });
         }
 
-        // දත්ත ගබඩාව (v3.1)
-        let vehicles = JSON.parse(localStorage.getItem('fuel_v31')) || [];
-        let activeIdx = 0;
+        // Install වෙන්න පුළුවන්ද බලන එක
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            document.getElementById('msg').innerText = "🚀 ඇප් එක ඉන්ස්ටෝල් කිරීමට සූදානම්!";
+            document.getElementById('msg').style.color = "#00ff88";
+        });
 
-        function tab(id, btn) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-            id === 'home' ? renderHome() : renderManage();
+        function save() {
+            localStorage.setItem('no', document.getElementById('v').value);
+            alert("Saved!");
         }
-
-        function renderHome() {
-            if(vehicles.length === 0) return;
-            const v = vehicles[activeIdx];
-            document.getElementById('dispV').innerText = v.no;
-            document.getElementById('dispQ').innerText = v.q + "L";
-            document.getElementById('dispU').innerText = v.u + "L";
-            document.getElementById('dispR').innerText = (v.q - v.u) + "L";
-            if(v.qr) {
-                const img = document.getElementById('mainQr');
-                img.src = v.qr; img.style.display = 'block';
-                document.getElementById('noQr').style.display = 'none';
-            }
-        }
-
-        function renderManage() {
-            const list = document.getElementById('vList');
-            list.innerHTML = '';
-            vehicles.forEach((v, i) => {
-                list.innerHTML += `<div class="v-card">
-                    <div><b>${v.no}</b><br><small>${v.type}</small></div>
-                    <button onclick="del(${i})" style="background:red; color:white; border:none; padding:8px 12px; border-radius:10px;">DEL</button>
-                </div>`;
-            });
-        }
-
-        function showForm() { document.getElementById('overlay').style.display = 'flex'; }
-        function hideForm() { document.getElementById('overlay').style.display = 'none'; }
-
-        function saveData() {
-            const no = document.getElementById('inV').value.toUpperCase();
-            const q = document.getElementById('inQ').value;
-            const u = document.getElementById('inU').value;
-            const type = document.getElementById('inT').value;
-            const f = document.getElementById('inF').files[0];
-
-            if(!no || !q || !f) return alert("Fill all details!");
-
-            const reader = new FileReader();
-            reader.onload = e => {
-                vehicles.push({no, q, u, type, qr: e.target.result});
-                localStorage.setItem('fuel_v31', JSON.stringify(vehicles));
-                hideForm(); renderHome(); tab('home', document.getElementById('btnH'));
-            };
-            reader.readAsDataURL(f);
-        }
-
-        function del(i) { if(confirm("Delete?")) { vehicles.splice(i,1); localStorage.setItem('fuel_v31', JSON.stringify(vehicles)); renderManage(); } }
-        window.onload = renderHome;
     </script>
 </body>
 </html>
