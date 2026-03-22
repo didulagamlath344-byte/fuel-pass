@@ -8,80 +8,84 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <link rel="manifest" href='data:application/json,{"id":"fuelpass-v5","name":"Fuel Pass Pro","short_name":"FuelPass","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#ffd700","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/483/483497.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+    <link rel="manifest" href='data:application/json,{"id":"fuel-pro-final","name":"Fuel Pass Pro","short_name":"FuelPass","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#ffd700","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/483/483497.png","sizes":"512x512","type":"image/png"}]}'>
 
-    <title>Fuel Pass Pro v5.0</title>
+    <title>Fuel Pass Pro Max</title>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap');
         
-        :root { --gold: #FFD700; --red: #ff4444; --green: #00ff88; --bg: #000; }
-
+        :root { --gold: #FFD700; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; height: 100dvh; overflow: hidden; }
-
-        /* UI Elements */
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,215,0,0.1); }
-        .logo h1 { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--gold); margin: 0; }
         
-        .tabs { display: flex; gap: 10px; padding: 10px 20px; background: #080808; }
-        .tab-btn { flex: 1; padding: 12px; border: 1px solid #222; background: #111; color: #666; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        body { 
+            margin: 0; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; 
+            height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* Install Banner */
+        #installBanner {
+            display: none; background: #00ff88; color: #000; padding: 12px;
+            font-weight: bold; text-align: center; font-size: 0.8rem; z-index: 999;
+        }
+
+        .header { padding: 15px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .logo h1 { font-family: 'Orbitron'; font-size: 1rem; color: var(--gold); margin: 0; }
+
+        .tabs { display: flex; padding: 10px 20px; gap: 10px; background: #080808; }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #333; background: #111; color: #666; font-weight: bold; cursor: pointer; }
         .tab-btn.active { background: var(--gold); color: #000; border: none; }
 
-        .view { display: none; flex-direction: column; align-items: center; padding: 20px; height: calc(100vh - 150px); overflow-y: auto; }
+        .view { display: none; flex: 1; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
         .view.active { display: flex; }
 
-        /* Main Card */
         .card { width: 100%; max-width: 350px; background: #0a0a0a; border-radius: 30px; padding: 25px; border: 1px solid #222; text-align: center; }
         .v-badge { background: var(--gold); color: #000; padding: 5px 15px; border-radius: 20px; font-family: 'Orbitron'; font-weight: 900; margin-bottom: 20px; display: inline-block; }
+        
         .qr-box { background: #fff; width: 100%; aspect-ratio: 1/1; border-radius: 20px; padding: 15px; display: flex; align-items: center; justify-content: center; }
         #mainQr { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Quota Stats */
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 20px; }
-        .stat-item { background: #111; padding: 10px; border-radius: 15px; border: 1px solid #222; }
-        .stat-item span { display: block; font-family: 'Orbitron'; color: var(--gold); font-size: 1rem; }
-        .stat-item small { font-size: 0.6rem; opacity: 0.5; text-transform: uppercase; }
+        .stat-card { background: #111; padding: 10px; border-radius: 15px; border: 1px solid #222; }
+        .stat-card span { display: block; font-family: 'Orbitron'; color: var(--gold); font-size: 1rem; }
+        .stat-card small { font-size: 0.6rem; opacity: 0.5; }
 
-        /* Garage List */
-        .v-item { background: #111; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid #222; }
+        .v-item { background: #111; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .v-item h4 { margin: 0; color: var(--gold); }
-        .btn-del { background: var(--red); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; }
-
-        /* Float & Overlays */
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #000; border: none; box-shadow: 0 10px 20px rgba(255,215,0,0.3); }
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; }
-        input, select { width: 100%; padding: 15px; border-radius: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; font-size: 1rem; }
         
-        #install-banner { display: none; background: var(--green); color: black; padding: 10px; width: 100%; font-weight: bold; font-size: 0.8rem; position: fixed; top: 0; z-index: 200; text-align: center; }
+        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #000; border: none; box-shadow: 0 10px 20px rgba(255,215,0,0.3); }
+
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; }
+        input, select { width: 100%; padding: 15px; border-radius: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; }
+        
+        .btn-main { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-family: 'Orbitron'; }
     </style>
 </head>
 <body>
 
-    <div id="install-banner" onclick="triggerInstall()">🚀 CLICK HERE TO INSTALL FUEL PASS PRO APP</div>
+    <div id="installBanner" onclick="installApp()">🚀 INSTALL FUEL PASS PRO APP (CLICK HERE)</div>
 
     <div class="header">
         <div class="logo"><h1>FUEL PASS PRO</h1></div>
-        <button style="background:none; border:1px solid #444; color:#666; border-radius:10px; padding:5px 10px; font-size:0.7rem;" onclick="location.reload(true)">V5.0 STABLE</button>
+        <button style="background:none; border:1px solid #444; color:#666; padding:5px 10px; border-radius:10px; font-size:0.7rem;" onclick="location.reload(true)">REFRESH</button>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" id="btnH" onclick="showTab('home', this)">MY CARD</button>
-        <button class="tab-btn" id="btnG" onclick="showTab('garage', this)">GARAGE</button>
+        <button class="tab-btn active" id="hT" onclick="tab('home', this)">MY CARD</button>
+        <button class="tab-btn" id="gT" onclick="tab('garage', this)">GARAGE</button>
     </div>
 
     <div id="home" class="view active">
         <div class="card">
-            <span class="v-badge" id="dispNo">ADD VEHICLE</span>
+            <span class="v-badge" id="dNo">NO VEHICLE</span>
             <div class="qr-box">
                 <img id="mainQr" src="" style="display:none;">
-                <p id="noMsg" style="color:#000; font-weight:bold; font-size:0.8rem;">ගරාජයට ගොස් වාහනයක් එක් කරන්න</p>
+                <p id="noMsg" style="color:#000; font-weight:bold;">ADD VEHICLE IN GARAGE</p>
             </div>
             <div class="stats">
-                <div class="stat-item"><span id="sQ">0L</span><small>Quota</small></div>
-                <div class="stat-item"><span id="sU" style="color:var(--red)">0L</span><small>Used</small></div>
-                <div class="stat-item"><span id="sR" style="color:var(--green)">0L</span><small>Remain</small></div>
+                <div class="stat-card"><span id="sQ">0L</span><small>Quota</small></div>
+                <div class="stat-card"><span id="sU" style="color:red">0L</span><small>Used</small></div>
+                <div class="stat-card"><span id="sR" style="color:lime">0L</span><small>Remain</small></div>
             </div>
         </div>
     </div>
@@ -93,45 +97,45 @@
 
     <div id="overlay">
         <h2 style="font-family:'Orbitron'; color:var(--gold);">NEW VEHICLE</h2>
-        <input type="text" id="iNo" placeholder="Vehicle No (e.g. WP CAB-1234)">
+        <input type="text" id="iNo" placeholder="Vehicle No (e.g. WP ABC-1234)">
         <select id="iType"><option value="Car">Car / Van</option><option value="Bike">Motor Bike</option><option value="3W">Three Wheel</option></select>
         <input type="number" id="iQ" placeholder="Weekly Quota (L)">
-        <input type="number" id="iU" placeholder="Used This Week (L)" value="0">
-        <p style="font-size: 12px;">Select QR Image:</p>
+        <input type="number" id="iU" placeholder="Used Amount (L)" value="0">
         <input type="file" id="iF" accept="image/*">
-        <button onclick="saveV()" style="background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:bold; width:100%; font-family:'Orbitron';">SAVE DATA</button>
-        <p onclick="document.getElementById('overlay').style.display='none'" style="color:red; margin-top:20px; cursor:pointer; font-weight:bold;">CANCEL</p>
+        <button class="btn-main" onclick="save()">SAVE TO GARAGE</button>
+        <p onclick="document.getElementById('overlay').style.display='none'" style="color:red; margin-top:20px; cursor:pointer; font-weight:bold; text-align:center;">CANCEL</p>
     </div>
 
     <script>
-        // --- 1. Service Worker & PWA Logic ---
+        // --- PWA Logic ---
         let deferredPrompt;
         if ('serviceWorker' in navigator) {
-            const swCode = `self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));`;
-            const blob = new Blob([swCode], {type: 'text/javascript'});
+            const sw = `self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
+            const blob = new Blob([sw], {type: 'text/javascript'});
             navigator.serviceWorker.register(URL.createObjectURL(blob));
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('install-banner').style.display = 'block';
+            document.getElementById('installBanner').style.display = 'block';
         });
 
-        function triggerInstall() {
+        function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(res => {
-                    if(res.outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
+                deferredPrompt.userChoice.then(() => {
+                    document.getElementById('installBanner').style.display = 'none';
+                    deferredPrompt = null;
                 });
             }
         }
 
-        // --- 2. App Logic ---
-        let vehicles = JSON.parse(localStorage.getItem('f_v5_data')) || [];
-        let activeIdx = localStorage.getItem('f_v5_idx') || 0;
+        // --- App Logic ---
+        let vehicles = JSON.parse(localStorage.getItem('f_data_v4')) || [];
+        let activeIdx = localStorage.getItem('f_idx') || 0;
 
-        function showTab(id, btn) {
+        function tab(id, btn) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -139,15 +143,15 @@
             if(id === 'home') renderHome(); else renderGarage();
         }
 
-        function saveV() {
+        function save() {
             const no = document.getElementById('iNo').value.toUpperCase();
             const f = document.getElementById('iF').files[0];
-            if(!no || !f) return alert("අංකය සහ QR එක ඇතුළත් කරන්න!");
+            if(!no || !f) return alert("අංකය සහ QR පින්තූරය දාන්න!");
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 vehicles.push({ no, q: document.getElementById('iQ').value, u: document.getElementById('iU').value, t: document.getElementById('iType').value, qr: e.target.result });
-                localStorage.setItem('f_v5_data', JSON.stringify(vehicles));
+                localStorage.setItem('f_data_v4', JSON.stringify(vehicles));
                 document.getElementById('overlay').style.display = 'none';
                 renderGarage();
             };
@@ -157,7 +161,7 @@
         function renderHome() {
             if(vehicles.length === 0) return;
             const v = vehicles[activeIdx] || vehicles[0];
-            document.getElementById('dispNo').innerText = v.no;
+            document.getElementById('dNo').innerText = v.no;
             document.getElementById('sQ').innerText = v.q + "L";
             document.getElementById('sU').innerText = v.u + "L";
             document.getElementById('sR').innerText = (v.q - v.u) + "L";
@@ -170,15 +174,15 @@
             const list = document.getElementById('vList');
             list.innerHTML = '';
             vehicles.forEach((v, i) => {
-                list.innerHTML += `<div class="v-item" onclick="setActive(${i})" style="${i==activeIdx?'border-color:var(--gold)':''}">
+                list.innerHTML += `<div class="v-item" onclick="setV(${i})" style="${i==activeIdx?'border-color:var(--gold)':''}">
                     <div><strong>${v.no}</strong><br><small>${v.t} | ${v.q}L</small></div>
-                    <button class="btn-del" onclick="delV(event, ${i})">මකන්න</button>
+                    <button style="background:red; color:white; border:none; padding:5px; border-radius:5px;" onclick="delV(event, ${i})">DEL</button>
                 </div>`;
             });
         }
 
-        function setActive(i) { activeIdx = i; localStorage.setItem('f_v5_idx', i); showTab('home', document.getElementById('btnH')); }
-        function delV(e, i) { e.stopPropagation(); if(confirm("මකන්නද?")) { vehicles.splice(i, 1); localStorage.setItem('f_v5_data', JSON.stringify(vehicles)); renderGarage(); } }
+        function setV(i) { activeIdx = i; localStorage.setItem('f_idx', i); tab('home', document.getElementById('hT')); }
+        function delV(e, i) { e.stopPropagation(); if(confirm("මකන්නද?")) { vehicles.splice(i, 1); localStorage.setItem('f_data_v4', JSON.stringify(vehicles)); renderGarage(); } }
 
         window.onload = renderHome;
     </script>
