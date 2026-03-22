@@ -2,187 +2,195 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href='data:application/json,{"id":"fuel-pro-final","name":"Fuel Pass Pro","short_name":"FuelPass","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#ffd700","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/483/483497.png","sizes":"512x512","type":"image/png"}]}'>
-
-    <title>Fuel Pass Pro Max</title>
-
+    <title>Fuel Pass Multi-Pro</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZ1ZWwgUGFzcyBQcm8iLAogICJzaG9ydF9uYW1lIjogIkZ1ZWxQYXNzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiI2ZmY2MwMCIsCiAgImljb25zIjogW3sgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi80ODMvNDgzNDk3LnBuZyIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiB9XQp9">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap');
+        :root { --gold: #ffcc00; --bg: #000; --glass: rgba(255,255,255,0.08); }
+        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
-        :root { --gold: #FFD700; --bg: #000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; background: var(--bg); font-family: 'Poppins', sans-serif; color: white; 
-            height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-        }
+        /* Navigation Tabs */
+        .tabs { display: flex; background: #111; border-bottom: 1px solid #222; z-index: 10; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; color: #888; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .tab-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
 
-        /* Install Banner */
-        #installBanner {
-            display: none; background: #00ff88; color: #000; padding: 12px;
-            font-weight: bold; text-align: center; font-size: 0.8rem; z-index: 999;
-        }
+        /* Vehicle Selector Bar */
+        .vehicle-selector { display: flex; overflow-x: auto; padding: 10px; gap: 10px; background: #0a0a0a; border-bottom: 1px solid #222; scrollbar-width: none; }
+        .vehicle-selector::-webkit-scrollbar { display: none; }
+        .v-chip { padding: 8px 15px; background: var(--glass); border-radius: 20px; font-size: 12px; white-space: nowrap; border: 1px solid transparent; }
+        .v-chip.selected { border-color: var(--gold); color: var(--gold); background: rgba(255,204,0,0.1); }
 
-        .header { padding: 15px 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .logo h1 { font-family: 'Orbitron'; font-size: 1rem; color: var(--gold); margin: 0; }
+        .view { display: none; flex: 1; overflow-y: auto; padding: 15px; text-align: center; }
+        .view.active { display: flex; flex-direction: column; }
 
-        .tabs { display: flex; padding: 10px 20px; gap: 10px; background: #080808; }
-        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #333; background: #111; color: #666; font-weight: bold; cursor: pointer; }
-        .tab-btn.active { background: var(--gold); color: #000; border: none; }
-
-        .view { display: none; flex: 1; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
-        .view.active { display: flex; }
-
-        .card { width: 100%; max-width: 350px; background: #0a0a0a; border-radius: 30px; padding: 25px; border: 1px solid #222; text-align: center; }
-        .v-badge { background: var(--gold); color: #000; padding: 5px 15px; border-radius: 20px; font-family: 'Orbitron'; font-weight: 900; margin-bottom: 20px; display: inline-block; }
-        
-        .qr-box { background: #fff; width: 100%; aspect-ratio: 1/1; border-radius: 20px; padding: 15px; display: flex; align-items: center; justify-content: center; }
+        /* Card Section */
+        .v-no-display { font-size: 36px; font-weight: 900; color: var(--gold); margin: 10px 0; text-transform: uppercase; }
+        .qr-container { background: white; width: 85vw; height: 85vw; max-width: 320px; margin: 10px auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 12px; box-shadow: 0 0 30px rgba(255,204,0,0.15); }
         #mainQr { width: 100%; height: 100%; object-fit: contain; }
-
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 20px; }
-        .stat-card { background: #111; padding: 10px; border-radius: 15px; border: 1px solid #222; }
-        .stat-card span { display: block; font-family: 'Orbitron'; color: var(--gold); font-size: 1rem; }
-        .stat-card small { font-size: 0.6rem; opacity: 0.5; }
-
-        .v-item { background: #111; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
-        .v-item h4 { margin: 0; color: var(--gold); }
         
-        .fab { position: fixed; bottom: 30px; right: 20px; background: var(--gold); width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #000; border: none; box-shadow: 0 10px 20px rgba(255,215,0,0.3); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-box { background: var(--glass); padding: 12px 5px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .s-val { color: var(--gold); font-size: 18px; font-weight: bold; }
+        .s-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; margin-top: 3px; }
 
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 30px; flex-direction: column; justify-content: center; }
-        input, select { width: 100%; padding: 15px; border-radius: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; }
-        
-        .btn-main { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-family: 'Orbitron'; }
+        /* Management Styles */
+        .card-list-item { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
+        .btn-add { background: var(--gold); color: black; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; margin-top: 10px; border: none; }
+        .btn-del { color: #ff4444; background: none; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 8px; font-size: 11px; }
+
+        /* Form Overlay */
+        #formOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; padding: 25px; flex-direction: column; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 10px; border: 1px solid #333; background: #1a1a1a; color: white; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div id="installBanner" onclick="installApp()">🚀 INSTALL FUEL PASS PRO APP (CLICK HERE)</div>
-
-    <div class="header">
-        <div class="logo"><h1>FUEL PASS PRO</h1></div>
-        <button style="background:none; border:1px solid #444; color:#666; padding:5px 10px; border-radius:10px; font-size:0.7rem;" onclick="location.reload(true)">REFRESH</button>
-    </div>
-
     <div class="tabs">
-        <button class="tab-btn active" id="hT" onclick="tab('home', this)">MY CARD</button>
-        <button class="tab-btn" id="gT" onclick="tab('garage', this)">GARAGE</button>
+        <button class="tab-btn active" onclick="switchTab('home', this)">FUEL PASS</button>
+        <button class="tab-btn" onclick="switchTab('manage', this)">MANAGE VEHICLES</button>
     </div>
 
     <div id="home" class="view active">
-        <div class="card">
-            <span class="v-badge" id="dNo">NO VEHICLE</span>
-            <div class="qr-box">
-                <img id="mainQr" src="" style="display:none;">
-                <p id="noMsg" style="color:#000; font-weight:bold;">ADD VEHICLE IN GARAGE</p>
+        <div class="vehicle-selector" id="topSelector">
             </div>
-            <div class="stats">
-                <div class="stat-card"><span id="sQ">0L</span><small>Quota</small></div>
-                <div class="stat-card"><span id="sU" style="color:red">0L</span><small>Used</small></div>
-                <div class="stat-card"><span id="sR" style="color:lime">0L</span><small>Remain</small></div>
+
+        <div id="cardContent">
+            <p class="v-no-display" id="dispV">NO DATA</p>
+            <div class="qr-container">
+                <img id="mainQr" src="" style="display:none;">
+                <p id="noQrText" style="color:#888;">කරුණාකර වාහනයක් ඇතුළත් කරන්න</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="s-val" id="dispQ">0L</div><div class="s-lbl">Quota</div></div>
+                <div class="stat-box"><div class="s-val" id="dispU">0L</div><div class="s-lbl">Used</div></div>
+                <div class="stat-box"><div class="s-val" id="dispR" style="color:#00ff88">0L</div><div class="s-lbl">Rem</div></div>
             </div>
         </div>
     </div>
 
-    <div id="garage" class="view">
-        <div id="vList" style="width: 100%;"></div>
-        <button class="fab" onclick="document.getElementById('overlay').style.display='flex'">+</button>
+    <div id="manage" class="view">
+        <h3 style="color:var(--gold); margin-top:0;">සියලුම වාහන</h3>
+        <div id="vList"></div>
+        <button class="btn-add" onclick="showForm()">+ නව වාහනයක් එක් කරන්න</button>
     </div>
 
-    <div id="overlay">
-        <h2 style="font-family:'Orbitron'; color:var(--gold);">NEW VEHICLE</h2>
-        <input type="text" id="iNo" placeholder="Vehicle No (e.g. WP ABC-1234)">
-        <select id="iType"><option value="Car">Car / Van</option><option value="Bike">Motor Bike</option><option value="3W">Three Wheel</option></select>
-        <input type="number" id="iQ" placeholder="Weekly Quota (L)">
-        <input type="number" id="iU" placeholder="Used Amount (L)" value="0">
-        <input type="file" id="iF" accept="image/*">
-        <button class="btn-main" onclick="save()">SAVE TO GARAGE</button>
-        <p onclick="document.getElementById('overlay').style.display='none'" style="color:red; margin-top:20px; cursor:pointer; font-weight:bold; text-align:center;">CANCEL</p>
+    <div id="formOverlay">
+        <h2 id="formTitle">නව වාහනය</h2>
+        <input type="text" id="inV" placeholder="වාහන අංකය (Ex: BGW-0898)">
+        <input type="number" id="inQ" placeholder="සතිපතා Quota (L)">
+        <input type="number" id="inU" placeholder="පාවිච්චි කළ ප්‍රමාණය (L)">
+        <label style="font-size:12px; color:#888;">QR Screenshot එක:</label>
+        <input type="file" id="inF" accept="image/*">
+        <button class="btn-add" onclick="saveVehicle()">තොරතුරු සුරකින්න</button>
+        <button onclick="hideForm()" style="background:none; border:none; color:#ff4444; margin-top:20px;">අවලංගු කරන්න</button>
     </div>
 
     <script>
-        // --- PWA Logic ---
-        let deferredPrompt;
-        if ('serviceWorker' in navigator) {
-            const sw = `self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
-            const blob = new Blob([sw], {type: 'text/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob));
-        }
+        let vehicles = JSON.parse(localStorage.getItem('f_v_list')) || [];
+        let currentIdx = parseInt(localStorage.getItem('f_v_idx')) || 0;
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBanner').style.display = 'block';
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    document.getElementById('installBanner').style.display = 'none';
-                    deferredPrompt = null;
-                });
-            }
-        }
-
-        // --- App Logic ---
-        let vehicles = JSON.parse(localStorage.getItem('f_data_v4')) || [];
-        let activeIdx = localStorage.getItem('f_idx') || 0;
-
-        function tab(id, btn) {
+        function switchTab(id, btn) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-            if(id === 'home') renderHome(); else renderGarage();
-        }
-
-        function save() {
-            const no = document.getElementById('iNo').value.toUpperCase();
-            const f = document.getElementById('iF').files[0];
-            if(!no || !f) return alert("අංකය සහ QR පින්තූරය දාන්න!");
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                vehicles.push({ no, q: document.getElementById('iQ').value, u: document.getElementById('iU').value, t: document.getElementById('iType').value, qr: e.target.result });
-                localStorage.setItem('f_data_v4', JSON.stringify(vehicles));
-                document.getElementById('overlay').style.display = 'none';
-                renderGarage();
-            };
-            reader.readAsDataURL(f);
+            if(id === 'home') renderHome();
+            if(id === 'manage') renderManage();
         }
 
         function renderHome() {
-            if(vehicles.length === 0) return;
-            const v = vehicles[activeIdx] || vehicles[0];
-            document.getElementById('dNo').innerText = v.no;
-            document.getElementById('sQ').innerText = v.q + "L";
-            document.getElementById('sU').innerText = v.u + "L";
-            document.getElementById('sR').innerText = (v.q - v.u) + "L";
-            document.getElementById('mainQr').src = v.qr;
-            document.getElementById('mainQr').style.display = 'block';
-            document.getElementById('noMsg').style.display = 'none';
+            const selector = document.getElementById('topSelector');
+            selector.innerHTML = '';
+            
+            if(vehicles.length === 0) {
+                document.getElementById('cardContent').style.opacity = '0.3';
+                return;
+            }
+
+            document.getElementById('cardContent').style.opacity = '1';
+            vehicles.forEach((v, index) => {
+                const chip = document.createElement('div');
+                chip.className = `v-chip ${index === currentIdx ? 'selected' : ''}`;
+                chip.innerText = v.vNo;
+                chip.onclick = () => { currentIdx = index; localStorage.setItem('f_v_idx', index); renderHome(); };
+                selector.appendChild(chip);
+            });
+
+            const current = vehicles[currentIdx] || vehicles[0];
+            document.getElementById('dispV').innerText = current.vNo;
+            document.getElementById('dispQ').innerText = current.q + "L";
+            document.getElementById('dispU').innerText = current.u + "L";
+            document.getElementById('dispR').innerText = (current.q - current.u) + "L";
+            
+            const qrImg = document.getElementById('mainQr');
+            if(current.qr) {
+                qrImg.src = current.qr;
+                qrImg.style.display = 'block';
+                document.getElementById('noQrText').style.display = 'none';
+            }
         }
 
-        function renderGarage() {
+        function renderManage() {
             const list = document.getElementById('vList');
             list.innerHTML = '';
-            vehicles.forEach((v, i) => {
-                list.innerHTML += `<div class="v-item" onclick="setV(${i})" style="${i==activeIdx?'border-color:var(--gold)':''}">
-                    <div><strong>${v.no}</strong><br><small>${v.t} | ${v.q}L</small></div>
-                    <button style="background:red; color:white; border:none; padding:5px; border-radius:5px;" onclick="delV(event, ${i})">DEL</button>
-                </div>`;
+            vehicles.forEach((v, index) => {
+                const item = document.createElement('div');
+                item.className = 'card-list-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight:bold; color:var(--gold)">${v.vNo}</div>
+                        <div style="font-size:11px; opacity:0.6">${v.q}L Quota</div>
+                    </div>
+                    <button class="btn-del" onclick="deleteVehicle(${index})">ඉවත් කරන්න</button>
+                `;
+                list.appendChild(item);
             });
         }
 
-        function setV(i) { activeIdx = i; localStorage.setItem('f_idx', i); tab('home', document.getElementById('hT')); }
-        function delV(e, i) { e.stopPropagation(); if(confirm("මකන්නද?")) { vehicles.splice(i, 1); localStorage.setItem('f_data_v4', JSON.stringify(vehicles)); renderGarage(); } }
+        function showForm() { document.getElementById('formOverlay').style.display = 'flex'; }
+        function hideForm() { document.getElementById('formOverlay').style.display = 'none'; }
+
+        function saveVehicle() {
+            const vNo = document.getElementById('inV').value.toUpperCase();
+            const q = document.getElementById('inQ').value;
+            const u = document.getElementById('inU').value;
+            const f = document.getElementById('inF').files[0];
+
+            if(!vNo || !q) return alert("අවශ්‍ය තොරතුරු ඇතුළත් කරන්න!");
+
+            const newV = { vNo, q, u: u || 0, qr: '' };
+
+            if(f) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    newV.qr = e.target.result;
+                    vehicles.push(newV);
+                    finalizeSave();
+                };
+                reader.readAsDataURL(f);
+            } else {
+                vehicles.push(newV);
+                finalizeSave();
+            }
+        }
+
+        function finalizeSave() {
+            localStorage.setItem('f_v_list', JSON.stringify(vehicles));
+            hideForm();
+            renderManage();
+            alert("සාර්ථකව සුරැකුණි!");
+        }
+
+        function deleteVehicle(index) {
+            if(confirm("මෙම වාහනය ඉවත් කිරීමට අවශ්‍යද?")) {
+                vehicles.splice(index, 1);
+                localStorage.setItem('f_v_list', JSON.stringify(vehicles));
+                if(currentIdx >= vehicles.length) currentIdx = 0;
+                localStorage.setItem('f_v_idx', currentIdx);
+                renderManage();
+            }
+        }
 
         window.onload = renderHome;
     </script>
