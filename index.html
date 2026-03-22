@@ -1,46 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Fuel Pass Pro</title>
     <link rel="manifest" href="manifest.json">
-    <title>Fuel Pro</title>
+    <meta name="theme-color" content="#ffd700">
     <style>
-        body { background: #000; color: #ffd700; font-family: sans-serif; text-align: center; padding: 50px; }
-        #status { font-size: 12px; color: #555; margin-top: 20px; }
-        .btn { background: #ffd700; padding: 15px; border-radius: 10px; width: 100%; border:none; font-weight:bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600&display=swap');
+        body { background: #000; color: #fff; font-family: 'Poppins', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .card { background: #111; border: 2px solid #ffd700; border-radius: 25px; width: 85%; padding: 25px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        h1 { font-family: 'Orbitron'; color: #ffd700; margin-bottom: 5px; font-size: 1.5rem; }
+        .qr-box { background: #fff; width: 220px; height: 220px; margin: 15px auto; border-radius: 15px; padding: 10px; display: none; }
+        #qr-img { width: 100%; height: 100%; object-fit: contain; }
+        .info { font-size: 1.2rem; font-weight: 600; margin: 10px 0; }
+        button { background: #ffd700; color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; margin-top: 10px; }
+        #install-btn { display: none; background: #00ff88; color: #000; margin-top: 20px; }
+        #status { font-size: 0.7rem; color: #444; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <h1>FUEL PASS PRO</h1>
-    <p id="msg">පද්ධතිය පරීක්ෂා කරමින්...</p>
-    
-    <div style="border: 1px solid #333; padding: 20px; border-radius: 15px;">
-        <input type="text" id="v" placeholder="Vehicle No" style="width:90%; padding:10px; margin-bottom:10px;">
-        <button class="btn" onclick="save()">SAVE DATA</button>
+
+    <div class="card">
+        <h1>FUEL PASS PRO</h1>
+        <div class="qr-box" id="qr-box"><img id="qr-img"></div>
+        <div class="info" id="v-no">දත්ත ඇතුළත් කර නැත</div>
+        <button onclick="showSetup()">SETTINGS</button>
+        <button id="install-btn">INSTALL APP NOW</button>
+        <div id="status">PWA: Checking...</div>
     </div>
 
-    <div id="status">Checking PWA Status...</div>
+    <div id="setup" style="display:none; position:fixed; inset:0; background:#000; padding:30px; z-index:100;">
+        <h2 style="color:#ffd700; font-family:'Orbitron';">SETUP</h2>
+        <input type="text" id="inV" placeholder="Vehicle Number" style="width:100%; padding:15px; border-radius:10px; border:1px solid #333; background:#111; color:#fff; margin-bottom:15px;">
+        <p>Upload QR Image:</p>
+        <input type="file" id="inF" accept="image/*" style="margin-bottom:20px;">
+        <button onclick="saveData()">SAVE & RELOAD</button>
+        <p onclick="location.reload()" style="color:red; margin-top:20px; text-align:center; cursor:pointer;">CANCEL</p>
+    </div>
 
     <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
         // Service Worker ලියාපදිංචිය
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-            .then(() => { document.getElementById('status').innerText = "✅ Service Worker: Active"; })
-            .catch(() => { document.getElementById('status').innerText = "❌ SW Error"; });
+            .then(() => document.getElementById('status').innerText = "✅ System Ready")
+            .catch(() => document.getElementById('status').innerText = "❌ SW Error");
         }
 
-        // Install වෙන්න පුළුවන්ද බලන එක
+        // Install Prompt එක අල්ලගන්නවා
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            document.getElementById('msg').innerText = "🚀 ඇප් එක ඉන්ස්ටෝල් කිරීමට සූදානම්!";
-            document.getElementById('msg').style.color = "#00ff88";
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
         });
 
-        function save() {
-            localStorage.setItem('no', document.getElementById('v').value);
-            alert("Saved!");
+        installBtn.addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') installBtn.style.display = 'none';
+                });
+            }
+        });
+
+        function showSetup() { document.getElementById('setup').style.display = 'block'; }
+
+        function saveData() {
+            const no = document.getElementById('inV').value.toUpperCase();
+            const file = document.getElementById('inF').files[0];
+            if(!no || !file) return alert("Fill all!");
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                localStorage.setItem('fuel_no', no);
+                localStorage.setItem('fuel_qr', e.target.result);
+                location.reload();
+            };
+            reader.readAsDataURL(file);
         }
+
+        window.onload = () => {
+            const no = localStorage.getItem('fuel_no');
+            const qr = localStorage.getItem('fuel_qr');
+            if(no) {
+                document.getElementById('v-no').innerText = no;
+                document.getElementById('qr-img').src = qr;
+                document.getElementById('qr-box').style.display = 'block';
+            }
+        };
     </script>
 </body>
 </html>
